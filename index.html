@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suno AI Song Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .active-nav {
+            background-color: #F59E0B; /* amber-500 */
+            color: #111827; /* gray-900 */
+            font-weight: 700;
+        }
+        .tag-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .tag-btn:hover {
+            transform: translateY(-2px);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .prompt-sandbox-container {
+            position: sticky;
+            top: 1.5rem;
+            height: fit-content;
+        }
+        .code-block-container {
+            background-color: #1a202c;
+            color: #a0aec0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .code-block-container pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .sandbox-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.15.0"
+  }
+}
+</script>
+</head>
+<body class="antialiased bg-gray-900 text-gray-300">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-400">Suno AI Song Architect</h1>
+            <p class="mt-2 text-lg text-gray-400">Ihr interaktiver Leitfaden zur Erstellung perfekter Musik-Prompts für Suno AI v5.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <nav id="main-nav" class="flex flex-wrap gap-2 mb-6 border-b border-gray-700 pb-4">
+                    <button data-section="lyrics-struktur" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold bg-gray-800 border border-gray-600 hover:bg-gray-700 active-nav">1. Lyrics & Struktur</button>
+                    <button data-section="styles-section" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold bg-gray-800 border border-gray-600 hover:bg-gray-700">2. Styles</button>
+                    <button id="reset-app-btn" class="nav-btn px-4 py-2 rounded-full text-sm font-semibold bg-red-800 border border-red-600 hover:bg-red-700 text-white">🔄 Reset</button>
+                </nav>
+
+                <div id="content-container">
+                    <!-- Section: 1. Lyrics & Struktur -->
+                    <section id="lyrics-struktur" class="content-section active space-y-12">
+                        <!-- Songstruktur -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🎵 Songarchitektur gestalten</h2>
+                            <p class="mb-6 text-gray-400">Verwenden Sie diese Tags in eckigen Klammern, um den Aufbau Ihres Tracks zu definieren. Die richtige Struktur ist entscheidend für einen kohärenten musikalischen Fluss. Suno v5 unterstützt Längen von bis zu 8 Minuten.</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 tag-container">
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Intro]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Verse]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Pre-Chorus]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Chorus]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Bridge]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Solo]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Instrumental]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Drop]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Outro]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Build-up]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Fade Out]</button>
+                                <button class="tag-btn p-3 bg-amber-950 text-amber-300 hover:bg-amber-900 rounded-lg font-mono text-sm">[Pause]</button>
+                            </div>
+                            <h3 class="text-lg font-semibold mt-8 mb-3 text-gray-200">DJ Mix-Tools</h3>
+                            <p class="mb-4 text-gray-400 text-sm">Fügen Sie perkussive Intros & Outros für nahtloses DJ-Mixing hinzu.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button class="tag-btn p-3 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-lg font-mono text-sm" data-template="[DJ Intro - 16 bars]&#10;[bars 1-8: kick drum only, four-on-the-floor]&#10;[bars 9-16: add crisp hi-hats]">
+                                    [DJ Intro - 16 bars]
+                                </button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm" data-template="[DJ Outro - 16 bars]&#10;[bars 1-8: strip down to kick, hi-hats, bass]&#10;[bars 9-16: kick and hi-hats only, then fade out]">
+                                    [DJ Outro - 16 bars]
+                                </button>
+                            </div>
+                            <h3 class="text-lg font-semibold mt-8 mb-3 text-gray-200">House & Repetition-Tools</h3>
+                            <p class="mb-4 text-gray-400 text-sm">Fügen Sie typische Wiederholungsstrukturen für den Chorus hinzu.</p>
+                            <div>
+                                <button class="tag-btn p-3 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-lg font-mono text-sm" data-template="[Chorus]&#10;&#10;[Chorus]&#10;&#10;[Chorus]&#10;&#10;[Chorus]">
+                                    [Chorus x4]
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Soundeffekte -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🔊 Soundeffekte & Atmosphäre</h2>
+                            <p class="mb-6 text-gray-400">Fügen Sie atmosphärische Klänge und spezifische Soundeffekte hinzu, um Ihre Geschichte zu untermalen. Verwenden Sie Klammern `[]` für präzise Effekte oder Sternchen `*...*` für eine natürlichere Integration.</p>
+                            <div class="flex flex-wrap gap-3 tag-container">
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: rain]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: thunder]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: crowd cheer]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: car horn]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: vinyl crackle]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: camera shutter]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: city ambience]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">[sound effect: ocean waves]</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">*soft wind blowing*</button>
+                                <button class="tag-btn p-3 bg-teal-950 text-teal-300 hover:bg-teal-900 rounded-lg font-mono text-sm">*footsteps on gravel*</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tipps -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">💡 Fortgeschrittene Strategien für Suno v5</h2>
+                            <p class="mb-6 text-gray-400">Suno v5 ist intelligenter und kontextbewusster als seine Vorgänger. Das bedeutet, dass Prompts weniger wie Befehlslisten und mehr wie Anweisungen an einen menschlichen Musiker funktionieren. Beherrschen Sie diese Techniken für herausragende Ergebnisse.</p>
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-3 text-gray-200">Das v5 Prompting-Paradigma</h3>
+                                    <ul class="space-y-4">
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Narrative Sätze für die Stimmung</h4>
+                                                <p class="text-gray-400">Beschreiben Sie den Songverlauf in ganzen Sätzen. V5 reagiert hervorragend auf geschichtenähnliche Anweisungen, die eine musikalische Reise beschreiben.</p>
+                                                <div class="code-block-container mt-2">
+                                                    <pre><code>Beginnt mit einem eindringlichen Klavier, entwickelt sich zu pulsierendem Techno mit einer treibenden Bassline und gipfelt in einem euphorischen Synth-Arpeggio.</code></pre>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">JSON-ähnliche Präzisions-Prompts</h4>
+                                                <p class="text-gray-400">Für maximale Kontrolle, strukturieren Sie Ihren Style-Prompt mit Schlüssel-Wert-Paaren. Dies minimiert Mehrdeutigkeit. Fokussieren Sie zuerst das "Styles"-Feld und klicken Sie dann auf den Button.</p>
+                                                <div class="mt-2">
+                                                    <button class="tag-btn p-3 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-lg font-mono text-sm w-full text-left">{"genre": "deep house", "bpm": 120, "mood": "groovy", "instruments": ["synth bass", "electric piano"]}</button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Anker-Deskriptoren</h4>
+                                                <p class="text-gray-400">Verstärken Sie die Kernstimmung, indem Sie wichtige Begriffe wie "filmisch" oder "emotional" sowohl am Anfang als auch am Ende des Style-Prompts platzieren. V5 priorisiert wiederholte Hinweise.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Eingebettete dynamische Anweisungen</h4>
+                                                <p class="text-gray-400">Nutzen Sie Meta-Tags wie `[upbeat]` oder `[guitar solo]` direkt in den Lyrics, um die Songstruktur und Instrumentierung im Verlauf des Tracks präzise zu steuern. Dies geht über einfache Struktur-Tags wie `[Verse]` hinaus.</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-3 text-gray-200">Wichtige v5-Erkenntnisse & Neue Funktionen</h3>
+                                    <ul class="space-y-4">
+                                        <li class="flex items-start">
+                                            <span class="text-yellow-400 mr-3 mt-1">⚠️</span>
+                                            <div>
+                                                <h4 class="font-semibold">Die "Letzte-Meile"-Herausforderung: Stem-Export</h4>
+                                                <p class="text-gray-400">Suno v5 kann bis zu 12 WAV-Stems exportieren, was ein großer Fortschritt ist. Professionelle Toningenieure berichten jedoch von "Audio-Bleeding" zwischen den Spuren (z.B. Synth-Sounds auf der Bass-Spur). Dies macht ein sauberes, professionelles Mastering ohne manuelle Nachbearbeitung schwierig.</p>
+                                                <p class="text-sm text-gray-500 mt-1"><strong>Fazit:</strong> Perfekt für hochwertige Demos und Ideenskizzen, aber für veröffentlichungsreife Tracks ist eventuell noch zusätzliche Audio-Software nötig, um die Stems zu säubern.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-sky-400 mr-3 mt-1">✨</span>
+                                            <div>
+                                                <h4 class="font-semibold">Neue Funktion: "Sample to Song"</h4>
+                                                <p class="text-gray-400">Sie können jetzt einen kurzen Audio-Schnipsel hochladen (z.B. eine gesummte Melodie, ein Beatbox-Rhythmus oder ein Gitarrenriff) und v5 entwickelt daraus eine vollständige Komposition. Dies eröffnet völlig neue kreative Wege jenseits von Text-Prompts.</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-3 text-gray-200">Allgemeine Best Practices (Weiterhin gültig)</h3>
+                                    <ul class="space-y-4">
+                                        <li class="flex items-start">
+                                            <span class="text-yellow-400 mr-3 mt-1">⚠️</span>
+                                            <div>
+                                                <h4 class="font-semibold">Problembehebung: KI singt meine Anweisungen!</h4>
+                                                <p class="text-gray-400">Wenn die KI beginnt, Ihre Anweisungen wie `[dramatischer Aufbau]` zu singen, liegt das daran, dass sie Vocals erwartet, aber keine Lyrics findet. Die Lösung ist, Anweisungen und Lyrics immer klar zu trennen.</p>
+                                                <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <h4 class="font-bold text-red-400 text-sm">FALSCH:</h4>
+                                                        <div class="code-block-container mt-1">
+                                                            <pre><code>[Pre-Chorus]
+[vocals become an explosive shout, building intensity]</code></pre>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-bold text-green-400 text-sm">RICHTIG:</h4>
+                                                        <div class="code-block-container mt-1">
+                                                            <pre><code>[Pre-Chorus]
+[vocals become an explosive shout, building intensity]
+DISCO ROCKER!</code></pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-2">Geben Sie der KI immer eine Textzeile zum Singen, wenn Sie eine Vokal-Anweisung geben.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Soundeffekte mit Sternchen (*Soundeffekt*)</h4>
+                                                <p class="text-gray-400">Schließen Sie Soundeffekte in Sternchen ein, um die KI dazu zu veranlassen, diese Klänge zu integrieren. Beispiele: `*Regen fällt sanft*`, `*Donner grollt entfernt*`, `*vinyl crackle*` oder `*camera shutter*`.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Klammern ((Text)) für Ad-libs, Flüstern, Echos</h4>
+                                                <p class="text-gray-400">Runde Klammern werden für untergeordnete Vokalebenen (Ad-libs, gesprochene Worte, Hintergrundharmonien) verwendet. Beispiel: `Es ist schon eine Weile her (eine Weile her)`.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Rein instrumentale Tracks erzwingen</h4>
+                                                <p class="text-gray-400">Um sicherzustellen, dass keine Vocals generiert werden, verwenden Sie `[NO VOCALS]` mehrfach im Lyrics-Feld.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Großbuchstaben (ALL CAPS) für Betonung</h4>
+                                                <p class="text-gray-400">Eine Textzeile in ALL CAPS mit einem Satzzeichen wie `!` kann den Stimmton lauter oder hervorstechender machen.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="text-green-400 mr-3 mt-1">✓</span>
+                                            <div>
+                                                <h4 class="font-semibold">Vokalverlängerungen mit Bindestrichen</h4>
+                                                <p class="text-gray-400">Verwenden Sie Bindestriche, um Vokale zu dehnen und eine melodische Qualität zu erzeugen, z.B. `Lie-e-e-be`.</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section: 2. Styles -->
+                    <section id="styles-section" class="content-section space-y-12">
+                         <!-- Gesang -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🎤 Die Stimme der KI formen (v5)</h2>
+                            <p class="mb-6 text-gray-400">Suno v5 bietet deutlich realistischere Vocals. Kombinieren Sie diese Tags, um Gesangsstil, Klangfarbe und Effekte präzise zu steuern.</p>
+                            <div class="space-y-6 tag-container">
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Vokalstile & Nuancen</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Simuliert feine Unvollkommenheiten und Emotionen für einen sehr authentischen, menschlichen Klang.">[remarkably human vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Fügt realistische Atemgeräusche hinzu, was den Gesang weniger künstlich und lebendiger macht.">[credible breath control]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Erzeugt eine leichte, natürliche Tonhöhenschwankung in gehaltenen Noten, typisch für menschliche Sänger.">[subtle vibrato]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Sorgt für einen flüssigen, weniger roboterhaften Gesangsfluss, der dem natürlichen Sprech- und Singrhythmus folgt.">[natural phrasing]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Erzeugt eine helle, ätherische und oft mit viel Hall versehene Stimme.">[Angelic voice]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono" title="Eine tiefe, männliche Stimme mit wenig Tonhöhenvariation, ideal für Erzählungen oder bestimmte Genres.">[deep, monotone male vocal]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Female Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Male Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Powerful Belting Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Aggressive Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Mellow Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Raspy Voice]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Operatic Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Child's Voice]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Choir]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Gospel Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Screaming Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">[Vocal Fry]</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Spoken-word</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Rapping</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Falsetto</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Whispered</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Airy</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Deep</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Smooth</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Gritty</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Soft</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Warm</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Raw</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Hintergrundgesang & Layering</h3>
+                                    <div class="bg-gray-800 border border-amber-500/30 rounded-lg p-4 my-4">
+                                        <h4 class="font-bold text-amber-400">Vocal FX Engineer</h4>
+                                        <p class="text-xs text-gray-400 mb-3">Platzieren Sie Ihren Cursor nach einer Textzeile und klicken Sie, um einen intelligenten Ad-lib- und Effekt-Layer hinzuzufügen (z.B. `(rocker disco)(vocal filter flanger)`).</p>
+                                        <button id="generate-doubler-fx-btn" class="w-full flex items-center justify-center px-3 py-2 bg-amber-600 hover:bg-amber-700 text-gray-900 font-bold rounded-md transition-all duration-200 transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                                            <span class="icon mr-2">🎙️</span>
+                                            <span class="btn-text">Doubler & FX hinzufügen</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Layered vocals</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Backup singers</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Harmonized layers</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Doubled vocals</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">(ethereal backing)</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Dissonant harmonies</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Auto-harmonized</button>
+                                    </div>
+                                    <p class="text-xs mt-2 text-gray-500">Tipp: Verwenden Sie Klammern im Text für Ad-libs, z.B. `(yeah)` oder `(cha)`.</p>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 mt-6 text-gray-200">Genre-spezifische Vokal-Presets</h3>
+                                    <p class="text-xs text-gray-500 mb-2">Fügen Sie empfohlene Vokal-Tags für gängige Genres hinzu.</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">House: soulful female vocals, diva</button>
+                                        <button class="tag-btn px-3 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Techno: processed vocal chops, robotic</button>
+                                        <button class="tag-btn px-3 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">80s: powerful belting vocals, anthemic</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Vokal-Effekte</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Auto-tuned</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Reverbed</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Distorted</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Filtered</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Vocoder</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Robotized</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Lo-fi</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Echoed</button>
+                                        <button class="tag-btn px-3 py-1 bg-sky-950 text-sky-300 hover:bg-sky-900 rounded-full text-xs font-mono">Pitch-shifted (up)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- Genre -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🎹 Genre-Vertiefung: House & Techno</h2>
+                            <div class="bg-blue-900/50 border border-blue-500/50 text-blue-200 px-4 py-3 rounded-lg relative mb-6" role="alert">
+                                <strong class="font-bold">Pro-Tipp:</strong>
+                                <span class="block sm:inline">Suno v5 glänzt bei akustischer Musik, Pop und Hip-Hop. Für härtere Genres (Heavy Metal, Hard Rock) oder sehr schnelles EDM liefert die ältere Version v4.5 oft noch druckvollere Ergebnisse.</span>
+                            </div>
+                            <p class="mb-6 text-gray-400">Kombinieren Sie Genre, Stimmung, Instrumente und Tempo, um den gewünschten Sound zu treffen. Klicken Sie auf die Tags, um eine Basis für Ihr Genre zu erstellen.</p>
+                            <div class="grid md:grid-cols-3 gap-6 tag-container">
+                                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                                    <h3 class="font-bold text-lg mb-3 text-emerald-400">House Music</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Stimmung:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Groovy</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Uplifting</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Soulful</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Euphoric</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Anthemic</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Big Room (early 2010s)</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Instrumente:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Electric Piano</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Synth Bass</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Warm analog synth pads</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Tight Roland 909 drums</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Deep pulsating sub bassline</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">Subtle filtered disco samples</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Tempo:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">125 BPM</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">128 BPM</button>
+                                                <button class="tag-btn px-2 py-1 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 rounded-full text-xs font-mono">driving four-on-the-floor beat</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                                    <h3 class="font-bold text-lg mb-3 text-indigo-400">Minimal Techno</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Stimmung:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Driving</button>
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Hypnotic</button>
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Industrial</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Instrumente:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Synth Loops</button>
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Heavy Kick Drum</button>
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">Percussive FX</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Tempo:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 rounded-full text-xs font-mono">130 BPM</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                                    <h3 class="font-bold text-lg mb-3 text-pink-400">80s Invincible Anthem</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Stimmung:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Epic</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Anthemic</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Powerful</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Nostalgic</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Invincible</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Instrumente:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Gated reverb snare</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Soaring electric guitar solo</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Powerful synth brass</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Big analog synth pads</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Driving bassline</button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm mb-1">Tempo & Produktion:</h4>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">140 BPM</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Big 80s production</button>
+                                                <button class="tag-btn px-2 py-1 bg-pink-950 text-pink-300 hover:bg-pink-900 rounded-full text-xs font-mono">Lots of reverb</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instrumente & Klänge -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🎸 Instrumente & Klänge</h2>
+                            <p class="mb-6 text-gray-400">Wählen Sie spezifische Instrumente und Sound-Charakteristika, um Ihre Komposition zu präzisieren.</p>
+                            <div class="flex flex-wrap gap-3 tag-container">
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Synth Bass]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Acid]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Distorted Kick]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Heavy Kick Drum]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Percussive FX]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Synth Pads]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Arpeggiator]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Analog Synth]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[909 Drums]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[808 Drums]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Acoustic Guitar]</button>
+                                <button class="tag-btn p-3 bg-fuchsia-950 text-fuchsia-300 hover:bg-fuchsia-900 rounded-lg font-mono text-sm">[Electric Guitar]</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Audio-Qualität & Produktion -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">🎚️ Audio-Qualität & Produktion (v5)</h2>
+                            <p class="mb-6 text-gray-400">Nutzen Sie die verbesserte Audio-Engine von v5, um den Mix und das allgemeine Klangbild Ihres Tracks zu beeinflussen.</p>
+                            <div class="space-y-6 tag-container">
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Klangcharakteristik</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[studio-grade fidelity]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[full mix]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[clean separation]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[incredible instrument separation]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[reduced noise]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Loud]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Clean mix]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Warm production]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Mastered]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Lo-fi]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[High fidelity]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Booming bass]</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">[Punchy drums]</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Sidechain-Kompression (Pumping-Effekt)</h3>
+                                    <p class="text-sm text-gray-500 mb-2">Erzeugt den rhythmischen "Pump"-Effekt, essentiell für viele elektronische Genres.</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">(sidechain pump)</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">(gentle pump effect)</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">(deep rhythmic pumping)</button>
+                                        <button class="tag-btn px-3 py-1 bg-purple-950 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-mono">(breathing in/out)</button>
+                                    </div>
+                                    <p class="text-xs mt-2 text-gray-500">Beschreiben Sie das Resultat des Effekts, z.B. "creating space for the kick".</p>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Positive Schlüsselwörter (Verstärken)</h3>
+                                    <p class="text-sm text-gray-500 mb-2">Nutzen Sie diese Tags, um der KI mitzuteilen, welche Qualitäten im Track besonders hervorgehoben werden sollen.</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Emotional Performance]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Dynamic Range]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Clear Vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Rich Harmonies]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Epic Build-up]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Polished]</button>
+                                        <button class="tag-btn px-3 py-1 bg-green-950 text-green-300 hover:bg-green-900 rounded-full text-xs font-mono">[Immersive]</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-2 text-gray-200">Negative Schlüsselwörter (Vermeiden)</h3>
+                                    <p class="text-sm text-gray-500 mb-2">Fügen Sie diese Tags hinzu, um häufige Probleme zu vermeiden und den Sound zu verfeinern. Oft als "negative prompts" bezeichnet.</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid muddy mix]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid off-key vocals]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid robotic feeling]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid excessive noise]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid monotonous delivery]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[avoid thin sound]</button>
+                                        <button class="tag-btn px-3 py-1 bg-red-950 text-red-300 hover:bg-red-900 rounded-full text-xs font-mono">[no audible clicks]</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stimmung & Emotionen -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4 text-amber-400">✨ Stimmung & Emotionen (Gesamttrack)</h2>
+                            <p class="mb-6 text-gray-400">Geben Sie dem KI-Modell Hinweise auf die gewünschte atmosphärische und emotionale Tiefe Ihres gesamten Songs.</p>
+                            <div class="flex flex-wrap gap-3 tag-container">
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Uplifting</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Soulful</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Driving</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Euphoric</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Anthemic</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Hypnotic</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Melancholic</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Energetic</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Dark</button>
+                                <button class="tag-btn p-3 bg-red-950 text-red-300 hover:bg-red-900 rounded-lg font-mono text-sm">Intense</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="prompt-sandbox-container space-y-6">
+                    <!-- Lyrics Sandbox -->
+                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                        <label for="lyrics-sandbox" class="block text-lg font-semibold mb-2 text-gray-200">🎵 Lyrics & Struktur</label>
+                        <p class="text-xs text-gray-500 mb-3">Hier geben Sie Ihren Text und die Songstruktur (z.B. [Verse]) ein.</p>
+                        <textarea id="lyrics-sandbox" class="w-full h-48 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition duration-200 resize-y" placeholder="[Intro]&#10;...&#10;[Verse]&#10;Mein Text hier...&#10;[Chorus]"></textarea>
+                        <div class="flex justify-between items-center mt-3">
+                            <div class="flex gap-2">
+                                <button id="copy-lyrics-btn" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-md transition">Kopieren</button>
+                                <button id="clear-lyrics-btn" class="px-3 py-1 bg-red-900 hover:bg-red-800 text-xs font-semibold rounded-md transition">Löschen</button>
+                            </div>
+                            <span id="copy-lyrics-feedback" class="text-xs text-green-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- Styles Sandbox -->
+                    <div id="styles-sandbox-container" class="bg-gray-800 p-4 rounded-lg border border-gray-700 transition-opacity duration-300">
+                        <label for="styles-sandbox" class="block text-lg font-semibold mb-2 text-gray-200">🎨 Styles</label>
+                        <p class="text-xs text-gray-500 mb-3">Definieren Sie hier den Musikstil, die Instrumente und die Stimmung.</p>
+                        <textarea id="styles-sandbox" class="w-full h-48 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition duration-200 resize-y" placeholder="Deep House, soulful female vocals, 125 BPM, warm analog synth pads...">A driving French House anthem at 128BPM with a relentless four-on-the-floor TR-909 beat, punchy kicks, off-beat hi-hats, and snare hits on 2 and 4. Features disco samples, a catchy filtered bassline, uplifting choir stabs, powerful Background Choir and layered vocal harmony, studio-grade fidelity, Clean and powerful studio mix and mastering.</textarea>
+                        <div class="flex justify-between items-center mt-3">
+                             <div class="flex gap-2">
+                                <button id="copy-styles-btn" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-md transition">Kopieren</button>
+                                <button id="clear-styles-btn" class="px-3 py-1 bg-red-900 hover:bg-red-800 text-xs font-semibold rounded-md transition">Löschen</button>
+                            </div>
+                            <span id="copy-styles-feedback" class="text-xs text-green-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- AI Architect -->
+                    <div class="bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 p-1 rounded-lg shadow-lg">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-100">Song-Architekt</h3>
+                            <p class="text-xs text-gray-400 mb-4">Kombiniert Ihre Eingaben zu einem fertigen Prompt. Aktivieren Sie den Profi-Modus für maximale Präzision.</p>
+                            
+                            <!-- Profi-Modus Section -->
+                            <div class="border-t border-b border-gray-700 my-4 py-4">
+                                <div class="flex items-center justify-between">
+                                    <label for="profi-mode-toggle" class="text-sm font-semibold text-gray-200 cursor-pointer">
+                                        Profi-Modus (Strukturierte Eingabe)
+                                    </label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="profi-mode-toggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-amber-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                                    </label>
+                                </div>
+                                
+                                <div id="profi-mode-inputs" class="hidden mt-4 space-y-3">
+                                    <div>
+                                        <label class="text-xs text-gray-400">Genre(s)</label>
+                                        <input id="profi-genre" type="text" placeholder="z.B. deep house, soulful" class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="text-xs text-gray-400">BPM</label>
+                                            <input id="profi-bpm" type="number" placeholder="125" class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-gray-400">Tonart (Key)</label>
+                                            <input id="profi-key" type="text" placeholder="C-Moll" class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-400">Stimmung / Mood</label>
+                                        <input id="profi-mood" type="text" placeholder="groovy, uplifting, melancholic" class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-400">Instrumente</label>
+                                        <textarea id="profi-instruments" rows="2" placeholder="electric piano, 909 drums, synth bass..." class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 resize-y"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-400">Vokalstil & Produktion</label>
+                                        <textarea id="profi-vocals-prod" rows="2" placeholder="soulful female vocals, studio-grade fidelity..." class="w-full text-sm bg-gray-900 border border-gray-600 rounded p-2 mt-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 resize-y"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id="create-structure-btn" class="w-full flex items-center justify-center px-4 py-3 bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold rounded-md transition-all duration-200 transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                                <span id="spinner" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-2"></span>
+                                <span class="icon mr-2">✨</span>
+                                <span class="btn-text">Struktur erstellen</span>
+                            </button>
+                             <div id="ai-feedback" class="text-xs text-red-400 mt-2 text-center h-4"></div>
+                        </div>
+                    </div>
+                     <!-- Final Prompt Output (Initially hidden) -->
+                    <div id="final-prompt-container" class="bg-gray-800 p-4 rounded-lg border border-emerald-500 hidden">
+                        <label for="final-prompt-output" class="block text-lg font-semibold mb-2 text-emerald-300">📄 Finaler Prompt (Editierbar)</label>
+                         <p class="text-xs text-gray-500 mb-3">Das ist der Vorschlag der KI. Sie können ihn hier bearbeiten und verfeinern, bevor Sie ihn kopieren.</p>
+                        <textarea id="final-prompt-output" class="w-full h-64 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200 resize-y"></textarea>
+                        <div class="flex justify-between items-center mt-3">
+                             <div class="flex gap-2">
+                                <button id="copy-final-btn" class="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-xs font-semibold rounded-md transition">Kopieren</button>
+                            </div>
+                            <span id="copy-final-feedback" class="text-xs text-green-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- Donate Button -->
+                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-center">
+                        <p class="text-sm text-gray-400 mb-3">Gefällt Ihnen dieses Tool? Unterstützen Sie die Weiterentwicklung mit einer kleinen Spende.</p>
+                        <a href="https://paypal.me/nu815?locale.x=de_DE&country.x=DE" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-md transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                            <span>Spenden via PayPal</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/index.tsx"></script>
+
+</body>
+</html>
