@@ -41,7 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const icon = createStructureBtn?.querySelector('.icon');
     const btnText = createStructureBtn?.querySelector('.btn-text');
 
-    if (!navContainer || !contentContainer || !lyricsSandbox || !stylesSandbox || !copyLyricsBtn || !clearLyricsBtn || !copyStylesBtn || !clearStylesBtn || !createStructureBtn || !aiFeedback || !finalPromptContainer || !finalPromptOutput || !copyFinalBtn || !copyFinalFeedback || !spinner || !btnText || !icon || !generateDoublerFxBtn || !resetAppBtn || !stylesSandboxContainer || !profiModeToggle || !profiModeInputs || !profiGenre || !profiBpm || !profiKey || !profiMood || !profiInstruments || !profiVocalsProd) {
+    // Debugger Elements
+    const debuggerContainer = document.getElementById('debugger-container');
+    const debuggerTitle = document.getElementById('debugger-title');
+    const debuggerOutput = document.getElementById('debugger-output');
+    const fixPromptBtn = document.getElementById('fix-prompt-btn');
+
+    if (!navContainer || !contentContainer || !lyricsSandbox || !stylesSandbox || !copyLyricsBtn || !clearLyricsBtn || !copyStylesBtn || !clearStylesBtn || !createStructureBtn || !aiFeedback || !finalPromptContainer || !finalPromptOutput || !copyFinalBtn || !copyFinalFeedback || !spinner || !btnText || !icon || !generateDoublerFxBtn || !resetAppBtn || !stylesSandboxContainer || !profiModeToggle || !profiModeInputs || !profiGenre || !profiBpm || !profiKey || !profiMood || !profiInstruments || !profiVocalsProd || !debuggerContainer || !debuggerTitle || !debuggerOutput || !fixPromptBtn) {
         console.error('One or more essential DOM elements are missing.');
         return;
     }
@@ -105,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const decodedTemplate = template.replace(/&#10;/g, '\n');
                 const currentValue = lyricsSandbox.value;
                 const separator = currentValue.length > 0 && !currentValue.endsWith('\n\n') 
-                                  ? (currentValue.endsWith('\n') ? '\n' : '\n\n') 
+                                  ? (currentValue.endsWith('\n') ? '\n' : '') 
                                   : '';
                 lyricsSandbox.value += separator + decodedTemplate;
                 lyricsSandbox.focus();
@@ -157,6 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackEl.textContent = 'Kopieren fehlgeschlagen.';
         }
     };
+
+    const hideDebugger = () => {
+        debuggerContainer?.classList.add('hidden');
+        fixPromptBtn?.classList.add('hidden');
+        if(debuggerOutput) debuggerOutput.innerHTML = '';
+    }
     
     const clearAndHideFinalPrompt = () => {
         if (!finalPromptContainer.classList.contains('hidden')) {
@@ -164,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             finalPromptOutput.value = '';
             if (copyFinalFeedback) copyFinalFeedback.textContent = '';
         }
+        hideDebugger();
     };
 
     copyLyricsBtn.addEventListener('click', () => handleCopy(lyricsSandbox, copyLyricsFeedback, 'Kopiert!'));
@@ -298,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         setAILoadingState(true);
-        finalPromptContainer.classList.add('hidden');
+        clearAndHideFinalPrompt();
 
         try {
             const systemInstruction = `You are an expert 'Suno AI Song Architect' and a musical co-producer. Your primary goal is to combine a user's potentially fragmented lyrics, structural ideas, and style descriptions into a single, cohesive, and professionally structured prompt ready for Suno AI. You MUST generate a complete song blueprint.
@@ -317,13 +330,23 @@ You will receive "Lyrics & Structure" and "Styles". The "Styles" input can be on
     *   **DJ Intro Example:** \`[DJ Intro - 16 bars]\\n[instrumental]\\n[bars 1-8: driving four-on-the-floor kick drum only]\\n[bars 9-16: add crisp 909 hi-hats and a subtle side-chained pad swell]\`
     *   **DJ Outro Example:** \`[DJ Outro - 16 bars]\\n[instrumental]\\n[bars 1-8: strip down to kick, hi-hats, and bassline]\\n[bars 9-16: kick and hi-hats only, then fade out]\`
 3.  **Detailed Musical Events:** Do not just list tags. Describe what happens musically within each section. Add bar counts (e.g., \`[Verse 1 - 16 bars]\`). Detail instrumentation, effects (filters, reverb), and dynamic changes.
-    *   **Good Example:** \`[Verse 1 - 16 bars]\\nsoulful female vocals enter,\\nwarm analog synth pads,\\ndeep pulsating sub bassline,\\nsubtle filtered disco samples\`
-    *   **Bad Example:** \`[Verse] some lyrics here\`
+    *   **Good Example:** \`[Verse 1 - 16 bars]\\n[soulful female vocals enter]\\n[warm analog synth pads]\\n[deep pulsating sub bassline]\\n[subtle filtered disco samples]\\nHere are the actual lyrics for the verse.\`
 4.  **Logical Flow:** If the user provides a minimal structure (e.g., just a verse and chorus), build a complete, logical song around it (Intro -> Verse -> Pre-Chorus -> Chorus -> Verse 2 -> Chorus -> Bridge -> Solo -> Chorus -> Outro).
-5.  **Strict Formatting:**
+5.  **Strict Bracket Formatting:** This is the most important rule.
     *   The FINAL output must be ONLY the complete prompt text. No explanations, no greetings, no markdown.
-    *   Use square brackets \`[]\` ONLY for structure, musical events, and specific instrument/vocal descriptors (e.g., \`[Verse]\`, \`[female vocals]\`, \`[fade out]\`, \`[low-pass filter sweep]\`). Ensure all brackets are properly matched. Do NOT use parentheses \`()\` for these tags.
-    *   Use commas to separate stylistic descriptors within a section (e.g., \`deep house, 125 BPM, groovy\`).
+    *   Use square brackets \`[]\` for ALL structural tags (\`[Verse]\`), musical events (\`[guitar solo]\`), and descriptive instructions (\`[warm analog synth pads]\`).
+    *   **CRITICAL:** Every single line that is NOT a lyric MUST be wrapped in its own \`[]\`. Do NOT write descriptive sentences without brackets.
+    *   **Correct Example:**
+        \`[Verse 1 - 16 bars]
+        [soulful female vocals enter]
+        [warm analog synth pads]
+        The AI sings this actual lyric line.\`
+    *   **Incorrect Example:**
+        \`[Verse 1 - 16 bars]
+        soulful female vocals enter,
+        warm analog synth pads.
+        The AI sings this actual lyric line.\`
+    *   Do NOT use parentheses \`()\` for these tags.
 6.  **Language:** Respond in the same language as the user's input (which will be German). All musical descriptions and structural tags should be in English, as Suno AI understands them best, but the lyrics themselves should remain in German if provided in German.
 7.  **Empty Lyric Section Handling:** This is the most important rule. If a structural section (e.g., \`[Verse]\`, \`[Instrumental]\`, \`[Solo]\`, and ESPECIALLY \`[DJ Intro]\` and \`[DJ Outro]\`) contains musical descriptions but has NO corresponding user-provided lyrics, you MUST add a clear instrumental directive. The simplest and best tag is just \`[instrumental]\`. You can also use \`[instrumental melody carries the theme]\` or \`[synth solo]\`. This is CRITICAL to prevent the AI from incorrectly singing the musical descriptions. NEVER leave a section with only descriptions and no lyrics or explicit instrumental directive.`;
             
@@ -343,6 +366,8 @@ You will receive "Lyrics & Structure" and "Styles". The "Styles" input can be on
             finalPromptOutput.style.height = 'auto';
             finalPromptOutput.style.height = `${finalPromptOutput.scrollHeight}px`;
 
+            const errors = debugPrompt(finalPromptOutput.value);
+            displayDebugResults(errors);
 
         } catch (error) {
             console.error('Error calling Gemini API:', error);
@@ -353,4 +378,117 @@ You will receive "Lyrics & Structure" and "Styles". The "Styles" input can be on
     };
 
     createStructureBtn.addEventListener('click', createStructure);
+
+    // --- PROMPT DEBUGGER LOGIC ---
+    interface PromptError {
+        lineNumber: number;
+        lineContent: string;
+        type: 'mismatched' | 'unbracketed_instruction';
+        message: string;
+    }
+
+    const debugPrompt = (promptText: string): PromptError[] => {
+        const errors: PromptError[] = [];
+        const lines = promptText.split('\n');
+        
+        const instructionKeywords = [
+            'solo', 'guitar', 'synth', 'bass', 'drum', 'kick', 'snare', 'hat', 'beat',
+            'reverb', 'delay', 'echo', 'filter', 'fade', 'sweep', 'pad', 'arp',
+            'instrumental', 'vocal', 'production', 'bpm', 'bars', 'chord', 'melody',
+            'anthem', 'soaring', 'driving', 'powerful', 'outro', 'intro', 'verse',
+            'chorus', 'bridge', 'drop', 'build-up', 'percussive'
+        ];
+
+        lines.forEach((line, index) => {
+            const trimmedLine = line.trim();
+            if (trimmedLine === '') return;
+
+            const lineNumber = index + 1;
+            const startsWithBracket = trimmedLine.startsWith('[');
+            const endsWithBracket = trimmedLine.endsWith(']');
+
+            if (startsWithBracket && !endsWithBracket) {
+                errors.push({
+                    lineNumber,
+                    lineContent: trimmedLine,
+                    type: 'mismatched',
+                    message: `Zeile ${lineNumber}: Öffnende Klammer '[' ohne schließende ']'.`
+                });
+            } else if (!startsWithBracket && endsWithBracket) {
+                errors.push({
+                    lineNumber,
+                    lineContent: trimmedLine,
+                    type: 'mismatched',
+                    message: `Zeile ${lineNumber}: Schließende Klammer ']' ohne öffnende '['.`
+                });
+            } else if (!startsWithBracket && !endsWithBracket) {
+                const lineLowerCase = trimmedLine.toLowerCase();
+                const containsKeyword = instructionKeywords.some(keyword => lineLowerCase.includes(keyword));
+                const wordCount = trimmedLine.split(/\s+/).length;
+
+                if (containsKeyword && wordCount < 15) { 
+                    errors.push({
+                        lineNumber,
+                        lineContent: trimmedLine,
+                        type: 'unbracketed_instruction',
+                        message: `Zeile ${lineNumber}: Mögliche Anweisung ohne Klammern: "${trimmedLine.substring(0, 40)}..."`
+                    });
+                }
+            }
+        });
+        return errors;
+    };
+
+    const displayDebugResults = (errors: PromptError[]) => {
+        if (!debuggerContainer || !debuggerTitle || !debuggerOutput || !fixPromptBtn) return;
+        
+        debuggerContainer.classList.remove('hidden');
+        debuggerOutput.innerHTML = '';
+
+        if (errors.length === 0) {
+            debuggerTitle.textContent = 'Debugger-Prüfung: Alles in Ordnung!';
+            debuggerTitle.className = 'text-lg font-semibold mb-3 text-emerald-400';
+            debuggerOutput.innerHTML = '<p class="text-gray-400">Keine offensichtlichen Fehler in der Klammer-Struktur gefunden.</p>';
+            fixPromptBtn.classList.add('hidden');
+        } else {
+            debuggerTitle.textContent = `Debugger-Prüfung: ${errors.length} Problem(e) gefunden`;
+            debuggerTitle.className = 'text-lg font-semibold mb-3 text-red-400';
+            errors.forEach(error => {
+                const errorEl = document.createElement('p');
+                errorEl.className = 'text-red-400 border-l-2 border-red-500 pl-2';
+                errorEl.textContent = error.message;
+                debuggerOutput.appendChild(errorEl);
+            });
+            fixPromptBtn.classList.remove('hidden');
+        }
+    };
+
+    const fixPromptErrors = () => {
+        if (!finalPromptOutput) return;
+        const currentPrompt = finalPromptOutput.value;
+        const errors = debugPrompt(currentPrompt);
+        if (errors.length === 0) return;
+
+        const lines = currentPrompt.split('\n');
+        
+        errors.forEach(error => {
+            const lineIndex = error.lineNumber - 1;
+            if (error.type === 'unbracketed_instruction') {
+                lines[lineIndex] = `[${lines[lineIndex].trim()}]`;
+            } else if (error.type === 'mismatched') {
+                const trimmed = lines[lineIndex].trim();
+                if (trimmed.startsWith('[') && !trimmed.endsWith(']')) {
+                    lines[lineIndex] = `${trimmed}]`;
+                } else if (!trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                    lines[lineIndex] = `[${trimmed}`;
+                }
+            }
+        });
+
+        finalPromptOutput.value = lines.join('\n');
+        const newErrors = debugPrompt(finalPromptOutput.value);
+        displayDebugResults(newErrors);
+    };
+
+    fixPromptBtn?.addEventListener('click', fixPromptErrors);
 });
